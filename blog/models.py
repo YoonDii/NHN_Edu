@@ -9,3 +9,5 @@ class Searchlist(models.Model):
     boby = models.CharField(max_length=500)
     attachment_list = models.CharField(max_length=500)
 
+    class Meta:
+        db_table = 'search_lists'
