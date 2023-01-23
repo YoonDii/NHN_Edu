@@ -12,8 +12,9 @@ options.add_argument("headless") #  브라우저 띄우지않기
 
 driver = webdriver.Chrome(service=Service(ChromeDriverManager(path="NHN_Edu").install()), options=options)
 
-yongin = "https://school.iamservice.net/organization/19710/group/2091428"#용인초
-driver.get(yongin)
+#성남시
+seongnam = "https://blog.naver.com/PostList.nhn?blogId=sntjdska123&from=postList&categoryNo=51"
+driver.get(seongnam)
 html = driver.page_source
 driver.implicitly_wait(5)
 
@@ -34,7 +35,9 @@ while True :
     last_height = new_height
 
 
-posts = driver.find_elements(By.CLASS_NAME,"bx_cont")
+posts = driver.find_elements(By.ID,"postListBody")
+
+
 # print(len(posts))#160
 
 post_list = []
@@ -43,11 +46,11 @@ for idx in range(len(posts[0:10])):
     post = posts[idx]
 
     #정보
-    url = post.find_element(By.CLASS_NAME,"btn_detail")
-    title = post.find_element(By.CLASS_NAME,"tit_cont").text
-    published_datetime = post.find_element(By.CLASS_NAME,"bx_etc").text
-    body = post.find_elements(By.CLASS_NAME,"desc")
-    attachment_list = post.find_elements(By.CLASS_NAME,"name")
+    url = post.find_element(By.TAG_NAME,'a')
+    title = post.find_element(By.CLASS_NAME,"title").text
+    published_datetime = post.find_element(By.CLASS_NAME,"date").text
+    body = None
+    attachment_list = None
 
     post_list.append({
         "url":url,
@@ -56,19 +59,22 @@ for idx in range(len(posts[0:10])):
         "body":body,
         "attachment_list":attachment_list,
         })
+
 # pprint.pprint(post_list)
 driver.quit()
 
 soup = BeautifulSoup(html, "html.parser")
 
-posts = soup.select(".bx_cont")
+posts = soup.select("thumnaillist")
 
-for post in posts:
-    title = post.select_one('h4.tit_cont').get_text()
+for idx in range(len(posts[0:10])):
+    post = posts[idx]
+    
     url = post.a['href']
-    published_datetime = post.select_one('span')
-    body = post.select('p.desc')
-    attachment_list = post.select('span.name')
+    title = post.find('strong.title').get_text()
+    published_datetime = post.select_one('span.date').get_text()
+    body = None
+    attachment_list = None
     post_list.append({
         "url":url,
         "title":title,

@@ -1,10 +1,12 @@
-import time , pprint
+import time , pprint, os,django
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.common.by import By
-
 from bs4 import BeautifulSoup
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "prepjt.settings")
+django.setup()
+from blog.models import Searchlist
 # from openpyxl import Workbook
 # from selenium.common.exceptions import ElementNotInteractableException
 
@@ -21,8 +23,9 @@ driver = webdriver.Chrome(service=Service(ChromeDriverManager(path="NHN_Edu").in
 
 # driver.get("https://school.iamservice.net/organization/1674/group/2001892")
 
-site = "https://school.iamservice.net/organization/1674/group/2001892"#수내초
-driver.get(site)
+#수내초
+sunae = "https://school.iamservice.net/organization/1674/group/2001892"
+driver.get(sunae)
 html = driver.page_source
 driver.implicitly_wait(5)
 
@@ -51,42 +54,76 @@ post_list = []
 for idx in range(len(posts[0:10])):
     post = posts[idx]
 
-    #정보
-    url = post.find_element(By.CLASS_NAME,"btn_detail")
-    title = post.find_element(By.CLASS_NAME,"tit_cont").text
-    published_datetime = post.find_element(By.CLASS_NAME,"bx_etc").text
-    body = post.find_elements(By.CLASS_NAME,"desc")
-    attachment_list = post.find_elements(By.CLASS_NAME,"name")
+#     #정보
+#     url = post.find_element(By.CLASS_NAME,"btn_detail")
+#     title = post.find_element(By.CLASS_NAME,"tit_cont").text
+#     published_datetime = post.find_element(By.CLASS_NAME,"bx_etc").text
+#     body = post.find_elements(By.CLASS_NAME,"desc")
+#     attachment_list = post.find_elements(By.CLASS_NAME,"name")
 
-    post_list.append({
-        "url":url,
-        "title":title,
-        "published_datetime":published_datetime,
-        "body":body,
-        "attachment_list":attachment_list,
-        })
-    # ws.append([url,title,published_datetime,body[0],attachment_list])
-# pprint.pprint(post_list)
+#     post_list.append({
+#         "url":url,
+#         "title":title,
+#         "published_datetime":published_datetime,
+#         "body":body,
+#         "attachment_list":attachment_list,
+#         })
+#     # ws.append([url,title,published_datetime,body[0],attachment_list])
+# # pprint.pprint(post_list)
 driver.quit()
 
 soup = BeautifulSoup(html, "html.parser")
 
 posts = soup.select(".bx_cont")
 
-for post in posts:
-    title = post.select_one('h4.tit_cont').get_text()
+for idx in range(len(posts[0:10])):
+    post = posts[idx]
+
     url = post.a['href']
-    published_datetime = post.p['span']
+    title = post.select_one('h4.tit_cont').get_text()
+    published_datetime = post.select_one('p.txt_date').text
     body = post.select('p.desc')
     attachment_list = post.select('span.name')
+
+    attlist = []
+    for att in range(len(attachment_list)):
+        attli = attachment_list[att]
+        a = attli.get_text()
+        attlist.append(a)
     post_list.append({
         "url":url,
         "title":title,
         "published_datetime":published_datetime,
         "body":body,
-        "attachment_list":attachment_list,
+        "attachment_list":attlist,
         })
 pprint.pprint(post_list)
+print(len(post_list))
 
 
+def add_data():
+    result = []
 
+    # 자료 수집 함수 실행
+    for data in post_list:
+        tmp = data
+        # 만들어진 dic를 리스트에 저장
+        result.append(tmp)
+    # print(result)
+
+    # DB에 저장
+    for item in result:
+
+        Searchlist(
+            url=(item["url"]),
+            title=(item["title"]),
+            published_datetime=(item["published_datetime"]),
+            body=(item["body"]),
+            attachment_list=(item["attachment_list"]),
+            
+        ).save()
+
+    return result
+
+
+add_data()
