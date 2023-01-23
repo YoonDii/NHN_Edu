@@ -1,6 +1,4 @@
-import json
-import requests
-
+import json,requests
 from django.shortcuts import render
 from .models import Searchlist
 from django.http import HttpResponse , JsonResponse
