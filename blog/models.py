@@ -1,15 +1,15 @@
 from django.db import models
-import os
-from django.conf import settings
+
 
 # Create your models here.
 
 class Searchlist(models.Model):
-    url = models.CharField(max_length=500)
-    title = models.CharField(max_length = 200)
-    published_datetime = models.DateTimeField(auto_now_add = True)
-    body = models.CharField(max_length=500)
-    attachment_list = models.CharField(max_length=500)
+    parse_type = models.CharField(max_length=100, blank=True, null=True)
+    url = models.CharField(max_length=900, blank=True, null=True)
+    title = models.CharField(max_length=200, blank=True, null=True)
+    body = models.TextField(blank=True, null=True)
+    published_datetime = models.DateTimeField(blank=True, null=True)
+    attachment_list = models.TextField(blank=True, null=True, default="empty")
 
-    class Meta:
-        db_table = 'search_list'
+    def __str__(self):
+        return self.title

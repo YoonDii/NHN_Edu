@@ -1,11 +1,13 @@
-import time , pprint, os,django
+import time , pprint, os,django,requests
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.common.by import By
 from bs4 import BeautifulSoup
+
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "prepjt.settings")
 django.setup()
+
 from blog.models import Searchlist
 # from openpyxl import Workbook
 # from selenium.common.exceptions import ElementNotInteractableException
@@ -101,29 +103,3 @@ pprint.pprint(post_list)
 print(len(post_list))
 
 
-def add_data():
-    result = []
-
-    # 자료 수집 함수 실행
-    for data in post_list:
-        tmp = data
-        # 만들어진 dic를 리스트에 저장
-        result.append(tmp)
-    # print(result)
-
-    # DB에 저장
-    for item in result:
-
-        Searchlist(
-            url=(item["url"]),
-            title=(item["title"]),
-            published_datetime=(item["published_datetime"]),
-            body=(item["body"]),
-            attachment_list=(item["attachment_list"]),
-            
-        ).save()
-
-    return result
-
-
-add_data()

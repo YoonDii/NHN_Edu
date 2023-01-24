@@ -1,10 +1,14 @@
-import time , pprint
+import time , pprint, os,django,requests
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.common.by import By
-
 from bs4 import BeautifulSoup
+
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "prepjt.settings")
+django.setup()
+
+from blog.models import Searchlist
 
 options = webdriver.ChromeOptions() # 크롬 옵션 객체 생성
 options.add_experimental_option("excludeSwitches",["enable-logging"]) # 불필요한 메세지 제거
@@ -35,7 +39,7 @@ while True :
     last_height = new_height
 
 
-posts = driver.find_elements(By.ID,"postListBody")
+posts = driver.find_elements(By.CLASS_NAME,"thumblist")
 
 
 # print(len(posts))#160
@@ -65,7 +69,7 @@ driver.quit()
 
 soup = BeautifulSoup(html, "html.parser")
 
-posts = soup.select("thumnaillist")
+posts = soup.select("thumblist")
 
 for idx in range(len(posts[0:10])):
     post = posts[idx]
