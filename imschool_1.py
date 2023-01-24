@@ -4,7 +4,7 @@ from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.common.by import By
 from bs4 import BeautifulSoup
-
+from datetime import datetime
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "prepjt.settings")
 django.setup()
 
@@ -56,20 +56,20 @@ post_list = []
 for idx in range(len(posts[0:10])):
     post = posts[idx]
 
-#     #정보
-#     url = post.find_element(By.CLASS_NAME,"btn_detail")
-#     title = post.find_element(By.CLASS_NAME,"tit_cont").text
-#     published_datetime = post.find_element(By.CLASS_NAME,"bx_etc").text
-#     body = post.find_elements(By.CLASS_NAME,"desc")
-#     attachment_list = post.find_elements(By.CLASS_NAME,"name")
+    #정보
+    url = post.find_element(By.CLASS_NAME,"btn_detail")
+    title = post.find_element(By.CLASS_NAME,"tit_cont").text
+    published_datetime = post.find_element(By.CLASS_NAME,"bx_etc").text
+    body = post.find_elements(By.CLASS_NAME,"desc")
+    attachment_list = post.find_elements(By.CLASS_NAME,"name")
 
-#     post_list.append({
-#         "url":url,
-#         "title":title,
-#         "published_datetime":published_datetime,
-#         "body":body,
-#         "attachment_list":attachment_list,
-#         })
+    post_list.append({
+        "url":url,
+        "title":title,
+        "published_datetime":published_datetime,
+        "body":body,
+        "attachment_list":attachment_list,
+        })
 #     # ws.append([url,title,published_datetime,body[0],attachment_list])
 # # pprint.pprint(post_list)
 driver.quit()
@@ -83,7 +83,8 @@ for idx in range(len(posts[0:10])):
 
     url = post.a['href']
     title = post.select_one('h4.tit_cont').get_text()
-    published_datetime = post.select_one('p.txt_date').text
+    published_datetime = post.select('span')[-1].get_text()
+    date_time = datetime.strptime(published_datetime,'%Y.%m.%d')
     body = post.select('p.desc')
     attachment_list = post.select('span.name')
 
@@ -92,14 +93,16 @@ for idx in range(len(posts[0:10])):
         attli = attachment_list[att]
         a = attli.get_text()
         attlist.append(a)
+        
     post_list.append({
         "url":url,
         "title":title,
-        "published_datetime":published_datetime,
+        "published_datetime":date_time,
         "body":body,
         "attachment_list":attlist,
         })
 pprint.pprint(post_list)
 print(len(post_list))
+
 
 

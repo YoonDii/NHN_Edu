@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>결과페이지</title>
+</head>
+<body>
+  <h1>크롤링 결과 추출</h1>
+  <p>
+  {% for p in post %}
+  <p>{</p>
+      url : {{p.url}}
+      <br>
+      title : {{p.title}}
+      <br>
+      body : {{p.body}}
+      <br>
+      published_datetime : {{p.published_datetime}}
+      <br>
+      attachment_list : {{p.attachment_list}}
+      <p>},</p>
+    <br>
+   {% endfor %}
+  </p>
+  <br>
+</body>
+</html>
